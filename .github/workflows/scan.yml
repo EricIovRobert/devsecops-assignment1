@@ -12,12 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker
-        run: |
-          sudo systemctl start docker
-          docker version
+        uses: actions/checkout@v5
 
       - name: Start MySQL container
         run: |
@@ -28,6 +23,18 @@ jobs:
             -e MYSQL_PASSWORD=wppass \
             -p 3306:3306 \
             mysql:8.0
+
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          for i in {1..30}; do
+            if docker exec wp-db mysqladmin ping -h localhost -u root -prootpassword --silent 2>/dev/null; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "Attempt $i..."
+            sleep 5
+          done
 
       - name: Start WordPress container
         run: |
@@ -42,13 +49,14 @@ jobs:
 
       - name: Wait for WordPress to be ready
         run: |
-          echo "Waiting for WordPress to start..."
+          echo "Waiting for WordPress..."
           for i in {1..30}; do
-            if curl -s http://localhost:8080 | grep -q "WordPress"; then
-              echo "WordPress is ready!"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "302" ]; then
+              echo "WordPress is up! HTTP status: $STATUS"
               break
             fi
-            echo "Attempt $i - not ready yet..."
+            echo "Attempt $i - HTTP status: $STATUS"
             sleep 5
           done
 
@@ -64,7 +72,7 @@ jobs:
             2>&1 | tee scans/wpscan-actions.txt || true
 
       - name: Upload WPScan results as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wpscan-results
           path: scans/wpscan-actions.txt
