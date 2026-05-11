@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "Waiting for WordPress..."
           for i in {1..30}; do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 2>/dev/null || echo "000")
             if [ "$STATUS" = "200" ] || [ "$STATUS" = "302" ]; then
               echo "WordPress is up! HTTP status: $STATUS"
               break
