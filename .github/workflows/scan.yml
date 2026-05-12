@@ -69,6 +69,19 @@ jobs:
             --network wp-network \
             --volumes-from wp-site \
             wordpress:cli \
+            wp config create \
+              --dbname=wordpress \
+              --dbuser=wpuser \
+              --dbpass=wppass \
+              --dbhost=wp-db:3306 \
+              --path=/var/www/html \
+              --allow-root \
+              --force
+
+          docker run --rm \
+            --network wp-network \
+            --volumes-from wp-site \
+            wordpress:cli \
             wp core install \
               --path=/var/www/html \
               --url=http://localhost:8080 \
