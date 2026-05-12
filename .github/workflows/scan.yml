@@ -68,19 +68,10 @@ jobs:
           docker run --rm \
             --network wp-network \
             --volumes-from wp-site \
-            wordpress:cli \
-            wp config create \
-              --dbname=wordpress \
-              --dbuser=wpuser \
-              --dbpass=wppass \
-              --dbhost=wp-db:3306 \
-              --path=/var/www/html \
-              --allow-root \
-              --force
-
-          docker run --rm \
-            --network wp-network \
-            --volumes-from wp-site \
+            -e WORDPRESS_DB_HOST=wp-db \
+            -e WORDPRESS_DB_USER=wpuser \
+            -e WORDPRESS_DB_PASSWORD=wppass \
+            -e WORDPRESS_DB_NAME=wordpress \
             wordpress:cli \
             wp core install \
               --path=/var/www/html \
@@ -94,10 +85,11 @@ jobs:
 
       - name: Run WPScan
         run: |
+          # Use the wp-network so WPScan can see the 'wp-site' container directly
           docker run --rm \
-            --network host \
+            --network wp-network \
             wpscanteam/wpscan \
-            --url http://localhost:8080 \
+            --url http://wp-site \
             --enumerate u,vp,vt \
             --force \
             --api-token ${{ secrets.WPSCAN_API_TOKEN }} \
