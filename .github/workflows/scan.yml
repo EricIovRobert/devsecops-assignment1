@@ -60,6 +60,22 @@ jobs:
             sleep 5
           done
 
+      - name: Install WordPress with WP-CLI
+        run: |
+          docker run --rm \
+            --volumes-from wp-site \
+            --network container:wp-site \
+            wordpress:cli \
+            wp core install \
+              --path=/var/www/html \
+              --url=http://localhost:8080 \
+              --title="Test Site" \
+              --admin_user=admin \
+              --admin_password=Admin1234! \
+              --admin_email=admin@example.com \
+              --skip-email \
+              --allow-root
+
       - name: Run WPScan
         run: |
           docker run --rm \
