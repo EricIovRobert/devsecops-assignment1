@@ -14,32 +14,23 @@ _______________________________________________________________
 
 [34m[i][0m It seems like you have not updated the database for some time.
 [?] Do you want to update now? [Y]es [N]o, default: [N][32m[+][0m URL: http://localhost:8081/ [::1]
-[32m[+][0m Started: Wed May 13 16:37:18 2026
+[32m[+][0m Started: Wed May 13 16:52:39 2026
 
 Interesting Finding(s):
 
 [32m[+][0m Headers
- | Interesting Entries:
- |  - Server: Apache
- |  - X-Powered-By: PHP/8.3.31
+ | Interesting Entry: Server: Apache
  | Found By: Headers (Passive Detection)
  | Confidence: 100%
 
-[32m[+][0m WordPress readme found: http://localhost:8081/readme.html
+[32m[+][0m This site has 'Must Use Plugins': http://localhost:8081/wp-content/mu-plugins/
  | Found By: Direct Access (Aggressive Detection)
- | Confidence: 100%
+ | Confidence: 80%
+ | Reference: http://codex.wordpress.org/Must_Use_Plugins
 
-[32m[+][0m The external WP-Cron seems to be enabled: http://localhost:8081/wp-cron.php
- | Found By: Direct Access (Aggressive Detection)
- | Confidence: 60%
- | References:
- |  - https://www.iplocation.net/defend-wordpress-from-ddos
- |  - https://github.com/wpscanteam/wpscan/issues/1299
 
-[32m[+][0m WordPress version 6.9.4 identified (Latest, released on 2026-03-11).
- | Found By: Rss Generator (Passive Detection)
- |  - http://localhost:8081/?feed=rss2, <generator>https://wordpress.org/?v=6.9.4</generator>
- |  - http://localhost:8081/?feed=comments-rss2, <generator>https://wordpress.org/?v=6.9.4</generator>
+Fingerprinting the version -: |================================================|
+[34m[i][0m The WordPress version could not be detected.
 
 [32m[+][0m WordPress theme in use: twentytwentyfive
  | Location: http://localhost:8081/wp-content/themes/twentytwentyfive/
@@ -74,23 +65,17 @@ Interesting Finding(s):
 
  Brute Forcing Author IDs -: |=================================================|
 
-[34m[i][0m User(s) Identified:
-
-[32m[+][0m t
- | Found By: Rss Generator (Passive Detection)
- | Confirmed By:
- |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)
- |  Login Error Messages (Aggressive Detection)
+[34m[i][0m No Users Found.
 
 [32m[+][0m WPScan DB API OK
  | Plan: free
- | Requests Done (during the scan): 2
- | Requests Remaining: 21
+ | Requests Done (during the scan): 1
+ | Requests Remaining: 11
 
-[32m[+][0m Finished: Wed May 13 16:37:21 2026
-[32m[+][0m Requests Done: 709
-[32m[+][0m Cached Requests: 9
-[32m[+][0m Data Sent: 188.129 KB
-[32m[+][0m Data Received: 446.738 KB
-[32m[+][0m Memory used: 345.762 MB
-[32m[+][0m Elapsed time: 00:00:02
+[32m[+][0m Finished: Wed May 13 16:52:43 2026
+[32m[+][0m Requests Done: 1977
+[32m[+][0m Cached Requests: 14
+[32m[+][0m Data Sent: 535.714 KB
+[32m[+][0m Data Received: 30.429 MB
+[32m[+][0m Memory used: 337.621 MB
+[32m[+][0m Elapsed time: 00:00:03
