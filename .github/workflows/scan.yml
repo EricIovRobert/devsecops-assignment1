@@ -62,8 +62,8 @@ jobs:
             sleep 5
           done
 
-          - name: Install WordPress with WP-CLI
-          run: |
+      - name: Install WordPress with WP-CLI
+        run: |
           docker run --rm \
             --network wp-network \
             --volumes-from wp-site \
