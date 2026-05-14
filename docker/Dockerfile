@@ -32,30 +32,22 @@ RUN mkdir -p /var/www/html/wp-content/mu-plugins && \
         echo 'add_action("do_feed_rss", "disable_feeds", 1);'; \
         echo 'add_action("do_feed_rss2", "disable_feeds", 1);'; \
         echo 'add_action("do_feed_atom", "disable_feeds", 1);'; \
+        echo 'if (!is_admin() && isset($_REQUEST["author"])) { wp_die("Author enumeration disabled."); }'; \
     } > /var/www/html/wp-content/mu-plugins/hardening.php
 
 RUN /usr/sbin/a2enmod headers rewrite && \
     sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf && \
     sed -i 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/000-default.conf && \
     { \
-        echo '<Directory /var/www/html>'; \
-        echo '  RewriteEngine On'; \
-        echo '  RewriteRule ^(xmlrpc\.php|wp-cron\.php|wp-links-opml\.php|readme\.html|license\.txt|robots\.txt) - [F]'; \
-        echo '  RewriteRule ^wp-admin/(install|upgrade)\.php - [F]'; \
-        echo '  RewriteCond %{QUERY_STRING} author=([0-9]*) [NC]'; \
-        echo '  RewriteRule .* - [F]'; \
-        echo '  RewriteCond %{QUERY_STRING} feed=(.*) [NC]'; \
-        echo '  RewriteRule .* - [F]'; \
-        echo '</Directory>'; \
-    } > /etc/apache2/conf-available/wpscan-block.conf && \
-    { \
+        echo '<FilesMatch "^(xmlrpc\.php|wp-cron\.php|wp-links-opml\.php|readme\.html|license\.txt|robots\.txt|install\.php|upgrade\.php)$">'; \
+        echo '    Require all denied'; \
+        echo '</FilesMatch>'; \
         echo 'ServerTokens Prod'; \
         echo 'ServerSignature Off'; \
         echo 'Header always set X-Content-Type-Options nosniff'; \
         echo 'Header always set X-Frame-Options SAMEORIGIN'; \
         echo 'Header always set X-XSS-Protection "1; mode=block"'; \
-    } >> /etc/apache2/apache2.conf && \
-    a2enconf wpscan-block
+    } >> /etc/apache2/apache2.conf
 
 RUN useradd -r -u 1000 -g www-data wpuser && \
     chown -R wpuser:www-data /var/www/html && \
