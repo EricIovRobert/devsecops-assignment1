@@ -17,23 +17,26 @@ RUN mkdir -p /var/www/html/wp-content/mu-plugins && \
     } \
     add_filter( 'style_loader_src', 'remove_wp_ver_css_js', 9999 ); \
     add_filter( 'script_loader_src', 'remove_wp_ver_css_js', 9999 ); \
+    /* Hide login errors */ \
+    add_filter('login_errors', function() { return 'Invalid credentials.'; }); \
     ?>" > /var/www/html/wp-content/mu-plugins/hardening.php
 
 RUN /usr/sbin/a2enmod headers rewrite && \
     sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf && \
     sed -i 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/000-default.conf && \
+    sed -i '/<VirtualHost \*:8080>/a \
+    <Directory /var/www/html>\n \
+        RewriteEngine On\n \
+        RewriteRule ^(xmlrpc\\.php|wp-cron\\.php|wp-links-opml\\.php|readme\\.html|license\\.txt) - [F]\n \
+        RewriteRule ^wp-admin/(install|upgrade)\\.php - [F]\n \
+        RewriteCond %{QUERY_STRING} author=([0-9]*) [NC]\n \
+        RewriteRule .* - [F]\n \
+        RewriteCond %{QUERY_STRING} feed=(.*) [NC]\n \
+        RewriteRule .* - [F]\n \
+    </Directory>' /etc/apache2/sites-available/000-default.conf && \
     { \
         echo 'ServerTokens Prod'; \
         echo 'ServerSignature Off'; \
-        echo '<Directory /var/www/html>'; \
-        echo '  RewriteEngine On'; \
-        echo '  RewriteRule ^(xmlrpc\.php|wp-cron\.php|wp-links-opml\.php) - [F]'; \
-        echo '  RewriteCond %{QUERY_STRING} author=([0-9]*) [NC]'; \
-        echo '  RewriteRule .* - [F]'; \
-        echo '  RewriteCond %{QUERY_STRING} feed=(.*) [NC]'; \
-        echo '  RewriteRule .* - [F]'; \
-        echo '  RewriteRule ^(readme\.html|license\.txt) - [F]'; \
-        echo '</Directory>'; \
         echo 'Header always set X-Content-Type-Options nosniff'; \
         echo 'Header always set X-Frame-Options SAMEORIGIN'; \
         echo 'Header always set X-XSS-Protection "1; mode=block"'; \
