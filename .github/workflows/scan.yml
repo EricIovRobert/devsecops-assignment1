@@ -35,11 +35,10 @@ jobs:
               echo "MySQL is ready!"
               break
             fi
-            echo "Attempt $i..."
             sleep 5
           done
 
-      - name: Start WordPress container
+      - name: Start Hardened WordPress container
         run: |
           docker run -d --name wp-site \
             --network wp-network \
@@ -47,8 +46,8 @@ jobs:
             -e WORDPRESS_DB_USER=wpuser \
             -e WORDPRESS_DB_PASSWORD=wppass \
             -e WORDPRESS_DB_NAME=wordpress \
-            -p 8080:80 \
-            wordpress:5.8
+            -p 8080:8080 \
+            ghcr.io/ericiovrobert/devsecops-assignment1atest:latest
 
       - name: Wait for WordPress to be ready
         run: |
@@ -56,40 +55,20 @@ jobs:
           for i in {1..30}; do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 2>/dev/null || echo "000")
             if [ "$STATUS" = "200" ] || [ "$STATUS" = "302" ]; then
-              echo "WordPress is up! HTTP status: $STATUS"
+              echo "WordPress is up! Status: $STATUS"
               break
             fi
-            echo "Attempt $i - HTTP status: $STATUS"
+            echo "Attempt $i - Status: $STATUS"
             sleep 5
           done
 
-      - name: Install WordPress with WP-CLI
-        run: |
-          docker run --rm \
-            --network wp-network \
-            --volumes-from wp-site \
-            -e WORDPRESS_DB_HOST=wp-db \
-            -e WORDPRESS_DB_USER=wpuser \
-            -e WORDPRESS_DB_PASSWORD=wppass \
-            -e WORDPRESS_DB_NAME=wordpress \
-            wordpress:cli \
-            wp core install \
-              --path=/var/www/html \
-              --url=http://localhost:8080 \
-              --title="Test Site" \
-              --admin_user=admin \
-              --admin_password=Admin1234! \
-              --admin_email=admin@example.com \
-              --skip-email \
-              --allow-root
-
       - name: Run WPScan
         run: |
-          # Use the wp-network so WPScan can see the 'wp-site' container directly
+          mkdir -p scans
           docker run --rm \
             --network wp-network \
             wpscanteam/wpscan \
-            --url http://wp-site \
+            --url http://wp-site:8080 \
             --enumerate u,vp,vt \
             --force \
             --api-token ${{ secrets.WPSCAN_API_TOKEN }} \
