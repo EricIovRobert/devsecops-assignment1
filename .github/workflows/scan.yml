@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Hardened WordPress Image
         run: |
-          docker build -t wp-hardened-local .
+          docker build -t wp-hardened-local ./docker
 
       - name: Start Hardened WordPress container
         run: |
