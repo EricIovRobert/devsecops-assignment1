@@ -62,6 +62,26 @@ jobs:
             sleep 5
           done
 
+          - name: Install WordPress with WP-CLI
+          run: |
+          docker run --rm \
+            --network wp-network \
+            --volumes-from wp-site \
+            -e WORDPRESS_DB_HOST=wp-db \
+            -e WORDPRESS_DB_USER=wpuser \
+            -e WORDPRESS_DB_PASSWORD=wppass \
+            -e WORDPRESS_DB_NAME=wordpress \
+            wordpress:cli \
+            wp core install \
+              --path=/var/www/html \
+              --url=http://localhost:8080 \
+              --title="Test Site" \
+              --admin_user=admin \
+              --admin_password=Admin1234! \
+              --admin_email=admin@example.com \
+              --skip-email \
+              --allow-root
+
       - name: Run WPScan
         run: |
           mkdir -p scans
