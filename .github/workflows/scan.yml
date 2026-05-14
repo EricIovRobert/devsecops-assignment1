@@ -38,10 +38,6 @@ jobs:
             sleep 5
           done
 
-      - name: Build Hardened WordPress Image
-        run: |
-          docker build -t wp-hardened-local ./docker
-
       - name: Start Hardened WordPress container
         run: |
           docker run -d --name wp-site \
@@ -51,7 +47,7 @@ jobs:
             -e WORDPRESS_DB_PASSWORD=wppass \
             -e WORDPRESS_DB_NAME=wordpress \
             -p 8080:8080 \
-            wp-hardened-local
+            ghcr.io/ericiovrobert/devsecops-assignment1atest:latest
 
       - name: Wait for WordPress to be ready
         run: |
@@ -78,7 +74,7 @@ jobs:
             wordpress:cli \
             wp core install \
               --path=/var/www/html \
-              --url=http://wp-site:8080 \
+              --url=http://localhost:8080 \
               --title="Test Site" \
               --admin_user=secure_user_name_123 \
               --admin_password=Admin1234! \
