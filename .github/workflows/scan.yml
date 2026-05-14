@@ -76,7 +76,7 @@ jobs:
               --path=/var/www/html \
               --url=http://localhost:8080 \
               --title="Test Site" \
-              --admin_user=admin \
+              --admin_user=secure_user_name_123 \
               --admin_password=Admin1234! \
               --admin_email=admin@example.com \
               --skip-email \
